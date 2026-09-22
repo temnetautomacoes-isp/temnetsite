@@ -8,7 +8,7 @@ export default defineConfig({
     port: 3000,
     open: false,
     watch: {
-      ignored: ['**/public/framesrtd/**', '**/.git/**']
+      ignored: ['**/public/frames/**', '**/public/framesrtd/**', '**/.git/**']
     }
   }
 });

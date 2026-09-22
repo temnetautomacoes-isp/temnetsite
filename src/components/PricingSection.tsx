@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Check, Zap, ArrowRight, ShieldCheck } from 'lucide-react';
 import { RESIDENTIAL_PLANS, CORPORATE_PLANS } from '../data/plans';
+import { RouterCanvasShowcase } from './RouterCanvasShowcase';
 import '../styles/Pricing.css';
 
 interface PricingSectionProps {
@@ -47,7 +48,12 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onOpenViability 
             </button>
           </div>
         </div>
+      </div>
 
+      {/* 3D Scrollytelling Interactive Router Showcase (160 frames GSAP ScrollTrigger) */}
+      <RouterCanvasShowcase />
+
+      <div className="container" style={{ marginTop: '3rem' }}>
         {/* Plans Grid */}
         <div className="pricing-grid">
           {currentPlans.map((plan) => (

@@ -1,0 +1,217 @@
+/* ==========================================================================
+   Router 3D Canvas Showcase (Scrollytelling GSAP)
+   ========================================================================== */
+
+.router-showcase-section {
+  position: relative;
+  width: 100%;
+  padding: 2rem 0;
+  z-index: 5;
+  overflow: hidden;
+}
+
+/* Pinned Container */
+.router-pinned-stage {
+  position: relative;
+  width: 100%;
+  max-width: 1140px;
+  height: 80vh;
+  min-height: 520px;
+  max-height: 720px;
+  margin: 0 auto;
+  border-radius: var(--radius-xl);
+  background: radial-gradient(ellipse at 50% 45%, #929092 0%, #48464a 45%, #18181b 85%, #09090b 100%);
+  border: 1px solid var(--border-medium);
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.8), 0 0 50px rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .router-pinned-stage {
+    height: 70vh;
+    min-height: 440px;
+    border-radius: var(--radius-lg);
+  }
+}
+
+/* Canvas Element */
+.router-3d-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  position: relative;
+  z-index: 2;
+  cursor: grab;
+}
+
+/* Subtle Vignette Overlay to blend frames edges into dark canvas */
+.canvas-vignette-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(9, 9, 11, 0.35) 75%, rgba(9, 9, 11, 0.85) 100%);
+}
+
+/* Top Header on Canvas Stage */
+.router-stage-header {
+  position: absolute;
+  top: 1.75rem;
+  left: 2rem;
+  right: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.stage-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(9, 9, 11, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  padding: 0.4rem 0.95rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.stage-frame-counter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(9, 9, 11, 0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  padding: 0.4rem 0.85rem;
+  font-size: 0.75rem;
+  font-family: var(--font-mono, monospace);
+  color: var(--text-secondary);
+}
+
+/* Scrollytelling Feature Callout Cards */
+.scrolly-callout-overlay {
+  position: absolute;
+  bottom: 2.25rem;
+  left: 2rem;
+  right: 2rem;
+  z-index: 10;
+  pointer-events: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.scrolly-card-active {
+  background: rgba(9, 9, 11, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.6rem;
+  max-width: 440px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+  transition: all var(--transition-normal);
+  animation: calloutFadeIn 300ms ease-out;
+}
+
+@keyframes calloutFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.scrolly-card-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 0.35rem;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.scrolly-card-desc {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Scroll Indicator / Progress Bar */
+.scrolly-progress-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.scrolly-progress-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.scrolly-progress-bar {
+  width: 140px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.scrolly-progress-fill {
+  height: 100%;
+  background: #ffffff;
+  border-radius: var(--radius-full);
+  transition: width 80ms linear;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+/* Preloader Indicator */
+.router-preloader {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  background: rgba(9, 9, 11, 0.92);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.preloader-spinner {
+  width: 38px;
+  height: 38px;
+  border: 3px solid rgba(255, 255, 255, 0.12);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 800ms linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.preloader-text {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
