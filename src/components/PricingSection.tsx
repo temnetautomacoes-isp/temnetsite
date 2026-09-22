@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Check, Zap, ArrowRight, ShieldCheck, Wifi } from 'lucide-react';
+import { Check, Zap, ArrowRight, ShieldCheck } from 'lucide-react';
 import { RESIDENTIAL_PLANS, CORPORATE_PLANS } from '../data/plans';
 import '../styles/Pricing.css';
 
@@ -25,9 +25,8 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onOpenViability 
   const headerRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
   const imagesRef = useRef<HTMLImageElement[]>([]);
+  const currentFrameRef = useRef<number>(0);
 
-  const [currentFrame, setCurrentFrame] = useState(0);
-  const [scrollProgress, setScrollProgress] = useState(0);
   const [isPreloaded, setIsPreloaded] = useState(false);
 
   // Intelligent Canvas Frame Rendering (1920x1080 background cover/contain)
@@ -80,7 +79,7 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onOpenViability 
     ctx.drawImage(img, offsetX, offsetY, drawW, drawH);
     ctx.restore();
 
-    setCurrentFrame(index);
+    currentFrameRef.current = index;
   };
 
   // 1. Asynchronous Preload of all 160 frames from /frames/
@@ -103,7 +102,7 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onOpenViability 
           resolve();
         };
         firstImg.onerror = () => {
-          // Fallback to framesrtd if needed
+          // Fallback to framesrtd or alternative alias if needed
           firstImg.src = `/framesrtd/ezgif-frame-001.png`;
           firstImg.onload = () => {
             if (!isCancelled) {
@@ -113,6 +112,7 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onOpenViability 
             }
             resolve();
           };
+          firstImg.onerror = () => resolve();
         };
       });
 
@@ -161,47 +161,65 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onOpenViability 
     };
   }, []);
 
-  // 2. GSAP ScrollTrigger: Pin section and scrub 160 frames + content transition
+  // 2. GSAP ScrollTrigger:
+  // Phase 1 (Print 1 to Print 2): ezgif-frame-001.png is strictly FIXED/STATIC.
+  // Phase 2 (Print 2 onwards): 3D animation plays 160 frames at 2x speed!
   useEffect(() => {
     if (!stageRef.current || !sectionRef.current) return;
 
     const ctx = gsap.context(() => {
-      // Pinned timeline scrubbing the 160 frames as background
       ScrollTrigger.create({
         trigger: sectionRef.current,
         start: 'top top',
-        end: '+=2000',
+        end: '+=1200', // Compressed scroll distance (animates 2x faster than before)
         pin: stageRef.current,
         pinSpacing: true,
-        scrub: 0.5,
+        scrub: 0.35,
         anticipatePin: 1,
         onUpdate: (self) => {
           const progress = self.progress;
-          setScrollProgress(progress);
+          const TRANSITION_END = 0.30; // Threshold between Print 1 (header) and Print 2 (cards)
 
-          // Frame scrubbing from 0 to 159
-          const frameIndex = Math.min(
-            TOTAL_FRAMES - 1,
-            Math.max(0, Math.floor(progress * (TOTAL_FRAMES - 1)))
-          );
-          renderFrame(frameIndex);
+          if (progress <= TRANSITION_END) {
+            // ========================================================
+            // FASE 1: Do Print 1 até o Print 2
+            // A imagem ezgif-frame-001.png fica TOTALMENTE FIXA (Frame 0)
+            // ========================================================
+            renderFrame(0);
 
-          // Fluid transition from Print 1 (Header/Toggle) to Print 2 (Pricing Cards)
-          if (headerRef.current && cardsRef.current) {
-            if (progress < 0.35) {
-              // Print 1: Header prominent, cards ready below
-              const p = progress / 0.35;
-              headerRef.current.style.opacity = `${1 - p * 0.3}`;
-              headerRef.current.style.transform = `translateY(${-p * 20}px)`;
-              cardsRef.current.style.opacity = `${0.2 + p * 0.4}`;
-              cardsRef.current.style.transform = `translateY(${50 - p * 30}px)`;
-            } else {
-              // Print 2: Cards fully locked into view with background router
-              const p = (progress - 0.35) / 0.65;
-              headerRef.current.style.opacity = `${0.7 - p * 0.35}`;
-              headerRef.current.style.transform = `translateY(${-20 - p * 25}px)`;
-              cardsRef.current.style.opacity = `${0.6 + p * 0.4}`;
-              cardsRef.current.style.transform = `translateY(${20 - p * 20}px)`;
+            const p = progress / TRANSITION_END;
+            if (headerRef.current) {
+              headerRef.current.style.opacity = `${Math.max(0, 1 - p * 1.1)}`;
+              headerRef.current.style.transform = `translateY(${-p * 70}px)`;
+              headerRef.current.style.pointerEvents = p > 0.8 ? 'none' : 'auto';
+            }
+            if (cardsRef.current) {
+              cardsRef.current.style.opacity = `${0.85 + p * 0.15}`;
+              cardsRef.current.style.transform = `translateY(${-p * 175}px)`;
+              cardsRef.current.style.pointerEvents = 'auto';
+            }
+          } else {
+            // ========================================================
+            // FASE 2: A partir do Print 2 (Cards em destaque total)
+            // O usuário ao rolar a tela agora vê a animação 3D dos 160 frames,
+            // rodando 2x mais rápido!
+            // ========================================================
+            const animProgress = (progress - TRANSITION_END) / (1 - TRANSITION_END);
+            const frameIndex = Math.min(
+              TOTAL_FRAMES - 1,
+              Math.max(0, Math.floor(animProgress * (TOTAL_FRAMES - 1)))
+            );
+            renderFrame(frameIndex);
+
+            if (headerRef.current) {
+              headerRef.current.style.opacity = '0';
+              headerRef.current.style.transform = 'translateY(-70px)';
+              headerRef.current.style.pointerEvents = 'none';
+            }
+            if (cardsRef.current) {
+              cardsRef.current.style.opacity = '1';
+              cardsRef.current.style.transform = 'translateY(-175px)';
+              cardsRef.current.style.pointerEvents = 'auto';
             }
           }
         }
@@ -209,7 +227,7 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onOpenViability 
     }, sectionRef);
 
     const handleResize = () => {
-      renderFrame(currentFrame);
+      renderFrame(currentFrameRef.current);
       ScrollTrigger.refresh();
     };
 
@@ -219,11 +237,11 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onOpenViability 
       window.removeEventListener('resize', handleResize);
       ctx.revert();
     };
-  }, [isPreloaded, currentFrame]);
+  }, [isPreloaded]);
 
   return (
     <section className="pricing-scrolly-section" id="planos" ref={sectionRef}>
-      {/* Pinned Stage that stays fixed during the 160-frame rotation */}
+      {/* Pinned Stage that stays fixed during the two phases */}
       <div className="pricing-pinned-viewport" ref={stageRef}>
         
         {/* 1. BACKGROUND CANVAS: 3D Wi-Fi 6 Router (160 frames) */}
@@ -268,14 +286,6 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onOpenViability 
                     Empresas & Link Dedicado
                   </button>
                 </div>
-              </div>
-            </div>
-
-            {/* Subtle Hardware Feature Badge while scrolling */}
-            <div className="hardware-floating-pill">
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem', padding: '0.35rem 0.9rem', borderRadius: 'var(--radius-full)', background: 'rgba(9, 9, 11, 0.75)', backdropFilter: 'blur(12px)', border: '1px solid var(--border-subtle)', fontSize: '0.78rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
-                <Wifi size={13} style={{ color: '#ffffff' }} />
-                <span>Wi-Fi 6 Gigabit Integrado • Giro 360° ({currentFrame + 1}/{TOTAL_FRAMES})</span>
               </div>
             </div>
 
@@ -362,16 +372,16 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onOpenViability 
               </div>
 
               {/* Corporate Consultation Callout */}
-              <div style={{ marginTop: '2.5rem', textAlign: 'center', padding: '1.25rem', background: 'rgba(9, 9, 11, 0.75)', backdropFilter: 'blur(12px)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-lg)' }}>
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem', color: '#ffffff', fontWeight: 600, fontSize: '0.9rem' }}>
-                  <ShieldCheck size={17} />
+              <div className="pricing-corporate-callout">
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem', color: '#ffffff', fontWeight: 600, fontSize: '0.88rem' }}>
+                  <ShieldCheck size={16} />
                   <span>Precisa de projeto com múltiplos IPs fixos, enlace de fibra ou SLA customizado?</span>
                 </div>
-                <div style={{ marginTop: '0.35rem' }}>
+                <div style={{ marginTop: '0.25rem' }}>
                   <button 
                     type="button" 
                     onClick={onOpenViability}
-                    style={{ background: 'none', border: 'none', color: '#ffffff', textDecoration: 'underline', fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem' }}
+                    style={{ background: 'none', border: 'none', color: '#ffffff', textDecoration: 'underline', fontWeight: 700, cursor: 'pointer', fontSize: '0.84rem' }}
                   >
                     Fale diretamente com nossa diretoria técnica &rarr;
                   </button>
