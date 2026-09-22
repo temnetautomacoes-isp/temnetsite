@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Menu, X, Radio, MapPin, ArrowRight } from 'lucide-react';
+import { Menu, X, MapPin, ArrowRight } from 'lucide-react';
+import logoImg from '../assets/logo.png';
 import '../styles/Navbar.css';
 
 interface NavbarProps {
@@ -17,7 +18,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenViability }) => {
         {/* Brand Logo */}
         <a href="#" className="navbar-brand" aria-label="TemNet Início">
           <div className="brand-icon">
-            <Radio size={20} strokeWidth={2.5} />
+            <img src={logoImg} alt="TemNet Logo" className="brand-logo-img" />
           </div>
           <div className="brand-text">
             <span className="brand-name">TemNet</span>

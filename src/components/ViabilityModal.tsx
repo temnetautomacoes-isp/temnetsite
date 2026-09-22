@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, CheckCircle, ArrowRight, ShieldCheck } from 'lucide-react';
+import logoImg from '../assets/logo.png';
 import '../styles/ViabilityModal.css';
 
 interface ViabilityModalProps {
@@ -44,6 +45,16 @@ export const ViabilityModal: React.FC<ViabilityModalProps> = ({ isOpen, onClose 
 
         {!submitted ? (
           <>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '1rem' }}>
+              <div style={{ width: '38px', height: '38px', background: '#ffffff', borderRadius: '10px', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 10px rgba(255,255,255,0.15)' }}>
+                <img src={logoImg} alt="TemNet Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+              </div>
+              <div>
+                <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#ffffff', lineHeight: 1.1 }}>TemNet</div>
+                <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>A sua conexão completa</div>
+              </div>
+            </div>
+
             <h3 className="modal-title">Consultar Viabilidade Técnica</h3>
             <p className="modal-subtitle">
               Verificamos a disponibilidade de porta óptica e infraestrutura na sua rua em tempo recorde.

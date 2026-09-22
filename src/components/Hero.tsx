@@ -11,6 +11,7 @@ import {
   Layers,
   ChevronRight
 } from 'lucide-react';
+import logoImg from '../assets/logo.png';
 import '../styles/Hero.css';
 
 interface HeroProps {
@@ -37,6 +38,9 @@ export const Hero: React.FC<HeroProps> = ({ onOpenViability }) => {
       <div className="container hero-content">
         {/* Top Tagline Badge */}
         <div className="hero-badge-container">
+          <div style={{ width: '20px', height: '20px', background: '#ffffff', borderRadius: '5px', padding: '2px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+            <img src={logoImg} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+          </div>
           <span className="hero-badge-tag">TemNet Bahia</span>
           <span>A sua conexão completa</span>
           <ChevronRight size={14} className="text-dim" />

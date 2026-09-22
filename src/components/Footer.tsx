@@ -1,5 +1,6 @@
 import React from 'react';
-import { Radio, Phone, Mail, MapPin, Shield, CheckCircle2 } from 'lucide-react';
+import { Phone, Mail, MapPin, Shield, CheckCircle2 } from 'lucide-react';
+import logoImg from '../assets/logo.png';
 import '../styles/Footer.css';
 
 export const Footer: React.FC = () => {
@@ -11,7 +12,7 @@ export const Footer: React.FC = () => {
           <div className="footer-brand-column">
             <div className="footer-brand-logo">
               <div className="brand-icon">
-                <Radio size={20} strokeWidth={2.5} />
+                <img src={logoImg} alt="TemNet Logo" className="brand-logo-img" />
               </div>
               <div className="brand-text">
                 <span className="brand-name">TemNet</span>
